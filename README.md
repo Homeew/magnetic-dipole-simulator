@@ -13,52 +13,57 @@ sensor array modeling and nonlinear least-squares parameter estimation.
 ## Physics
 
 The magnetic field of a dipole at position **p** with moment **m**, observed at **r**:
-B(r) = (μ₀/4π) × [3(m·r̂)r̂ − m] / |r|³
 
-where `r = observation − p` and `r̂ = r/|r|`.
+    B(r) = (mu0/4pi) x [3(m.rhat)rhat - m] / |r|^3
+
+where r = observation - p and rhat = r/|r|.
 
 ## Results
 
-| Array type | Sensors | Position error | Moment error |
-|------------|---------|---------------|--------------|
-| Ring (r=0.08m, z=0.10m) | 16 | **0.0007 mm** | 0.00003 A·m² |
-| Grid (0.5×0.5m, z=0.30m) | 64 | 0.46 mm | 0.011 A·m² |
+| Array type                | Sensors | Position error | Moment error  |
+|---------------------------|---------|----------------|---------------|
+| Ring (r=0.08m, z=0.10m)   | 16      | **0.0007 mm**  | 0.00003 A.m2  |
+| Grid (0.5x0.5m, z=0.30m)  | 64      | 0.46 mm        | 0.011 A.m2    |
 
-Noise level: 1 nT (SNR ≈ 111 dB for ring array)
+Noise level: 1 nT (SNR ~ 111 dB for ring array)
 
 ## Project structure
-include/
-vec3.hpp — 3D vector math
-dipole.hpp — dipole field model
-noise.hpp — Gaussian noise generator
-sensor.hpp — single 3-axis magnetometer
-sensor_array.hpp — sensor collection + ring/grid/sphere factories
-lm_solver.hpp — Levenberg-Marquardt solver
-src/
-sensor_array.cpp — geometry implementations
-lm_solver.cpp — full LM optimisation loop
-main.cpp — demo: simulate, solve, print results
-tests/
-test_dipole.cpp — 129 unit test assertions (Catch2)
 
+    include/
+      vec3.hpp          - 3D vector math
+      dipole.hpp        - dipole field model
+      noise.hpp         - Gaussian noise generator
+      sensor.hpp        - single 3-axis magnetometer
+      sensor_array.hpp  - sensor collection + ring/grid/sphere factories
+      lm_solver.hpp     - Levenberg-Marquardt solver
+    src/
+      sensor_array.cpp  - geometry implementations
+      lm_solver.cpp     - full LM optimisation loop
+      main.cpp          - demo: simulate, solve, print results
+    tests/
+      test_dipole.cpp   - 129 unit test assertions (Catch2)
 
 ## Build
 
-```bash
-mkdir build && cd build
-cmake ..
-make -j4
+    mkdir build && cd build
+    cmake ..
+    make -j4
+
 Requires: g++ (C++17), cmake >= 3.14. Catch2 is downloaded automatically.
 
-Run
-./dipole_sim    # run the demo
-./tests         # run unit tests
-Class design
-Class	Responsibility
-Vec3	3D vector arithmetic
-DipoleSource	Field model + parameter serialisation
-Sensor	Single 3-axis measurement
-SensorArray	Collection of sensors + geometry factories
-GaussianNoise	Reproducible noise injection
-LMSolver	Nonlinear least-squares via Levenberg-Marquardt
-LMResult	Solver output (estimate, cost, convergence info)
+## Run
+
+    ./dipole_sim    # run the full demo
+    ./tests         # run all unit tests
+
+## Class design
+
+| Class          | Responsibility                                      |
+|----------------|-----------------------------------------------------|
+| Vec3           | 3D vector arithmetic                                |
+| DipoleSource   | Field model + parameter serialisation               |
+| Sensor         | Single 3-axis measurement                           |
+| SensorArray    | Collection of sensors + geometry factories          |
+| GaussianNoise  | Reproducible noise injection                        |
+| LMSolver       | Nonlinear least-squares via Levenberg-Marquardt     |
+| LMResult       | Solver output (estimate, cost, convergence info)    |
