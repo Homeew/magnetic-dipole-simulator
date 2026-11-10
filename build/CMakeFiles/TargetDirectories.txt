@@ -1,0 +1,9 @@
+/home/omid/magnetic-dipole-simulator/build/CMakeFiles/dipole_lib.dir
+/home/omid/magnetic-dipole-simulator/build/CMakeFiles/dipole_sim.dir
+/home/omid/magnetic-dipole-simulator/build/CMakeFiles/tests.dir
+/home/omid/magnetic-dipole-simulator/build/CMakeFiles/test.dir
+/home/omid/magnetic-dipole-simulator/build/CMakeFiles/edit_cache.dir
+/home/omid/magnetic-dipole-simulator/build/CMakeFiles/rebuild_cache.dir
+/home/omid/magnetic-dipole-simulator/build/_deps/catch2-build/CMakeFiles/test.dir
+/home/omid/magnetic-dipole-simulator/build/_deps/catch2-build/CMakeFiles/edit_cache.dir
+/home/omid/magnetic-dipole-simulator/build/_deps/catch2-build/CMakeFiles/rebuild_cache.dir
