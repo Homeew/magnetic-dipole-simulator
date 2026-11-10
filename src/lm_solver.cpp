@@ -230,13 +230,13 @@ LMResult LMSolver::solve(const SensorArray&       array,
 
         if (newCost < currCost) {
             // ── Accept the step ──────────────────────────────────────────
-
+            result.costHistory.push_back(newCost);
             double relDelta = std::fabs(currCost - newCost) / (currCost + 1e-30);
 
             double dxNorm = 0;
             for (auto v : dx) dxNorm += v*v;
             dxNorm = std::sqrt(dxNorm);
-
+            result.costHistory.push_back(newCost);
             result.estimated = candidate;   // update estimate
             r        = rNew;                // update residuals
             currCost = newCost;             // update cost

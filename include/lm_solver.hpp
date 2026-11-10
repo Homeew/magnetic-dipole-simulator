@@ -15,6 +15,7 @@ struct LMResult {
     int          iterations{0};   // how many iterations it took
     bool         converged{false};// true if a tolerance was met
     std::string  message;         // human-readable reason for stopping
+    std::vector<double> costHistory;  // cost at each accepted iteration
 };
 
 /**
