@@ -158,6 +158,31 @@ Requires: g++ (C++17), cmake >= 3.14. Catch2 is downloaded automatically.
     ./dipole_sim --benchmark    # noise + sensor sweep
     ./dipole_sim --montecarlo   # Monte Carlo noise analysis (300 trials × 6 levels)
     ./tests                     # unit tests
+
+## Python bindings (pybind11)
+
+Call the C++ solver directly from Python — no subprocess, full speed.
+
+```python
+import sys
+sys.path.insert(0, 'build/')
+import dipole_py
+
+# Define true dipole
+truth = dipole_py.DipoleSource(dipole_py.Vec3(0.05, -0.03, 0.02),
+                                dipole_py.Vec3(0.0,  0.0,   1.5))
+
+# Build sensor array and add noise
+array  = dipole_py.SensorArray.ring(16, 0.08, 0.10)
+noise  = dipole_py.GaussianNoise(sigma=1e-9, seed=42)
+meas   = array.measureNoisy(truth, noise)
+
+# Solve
+init   = dipole_py.DipoleSource(dipole_py.Vec3(0, 0, 0), dipole_py.Vec3(0, 0, 1))
+result = dipole_py.LMSolver().solve(array, meas, init)
+
+print(result.converged)    # True
+print(result.iterations)   # 8
 ## Class design
 
 | Class          | Responsibility                                   |
