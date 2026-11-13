@@ -1,3 +1,36 @@
+## Research Context
+
+This project is a clean, standalone C++ reimplementation of the core estimation
+pipeline underlying the following published research on **magnetic localization
+for wireless capsule endoscopy (WCE)**:
+
+| Year | Publication |
+|------|-------------|
+| 2026 | **Two-stage cylindrical magnetic localization with neural network calibration for wearable capsule endoscopy** — O. Yaghoobian, M. Einlou, K.A. Wahid. *Scientific Reports* |
+| 2026 | **Layer-Conditioned Magnetic Localization with Residual-Weighted Fusion for Wireless Capsule Endoscopy Under Asymmetric Sensor Visibility and GI Motion** — O. Yaghoobian, H. Keshmiri, M. Einlou, K.A. Wahid. *IEEE Access* |
+| 2026 | **SNR-Weighted Layer-Conditioned Magnetometer Array with Ellipsoid Calibration and Neural Network Initialization for Capsule Endoscopy Localization Under Asymmetric Sensor Visibility** — O. Yaghoobian, K.A. Wahid. *Sensors* |
+| 2025 | **A New Localization Algorithm for a Two-Layer Magnetic Sensor Array in Capsule Endoscopy** — O. Yaghoobian, K.A. Wahid. *ICCIT 2025* |
+
+### How this code relates to the research
+
+In WCE, a capsule containing a permanent magnet travels through the GI tract.
+An external array of magnetometers measures the field it produces. The goal is
+to recover the capsule's 3D position and orientation in real time.
+
+This simulator implements the **core estimation pipeline**:
+
+- `DipoleSource` — models the capsule magnet as a magnetic dipole (the standard
+  model used in all publications above)
+- `SensorArray` — models the external magnetometer array (ring and grid
+  geometries match the two-layer array architecture from the 2025/2026 papers)
+- `GaussianNoise` — models real magnetometer noise (1 nT floor, consistent with
+  hardware used in the lab)
+- `LMSolver` — the nonlinear least-squares estimator at the heart of the
+  localization pipeline
+
+The solver achieves **sub-millimetre position recovery** at realistic noise
+levels — consistent with the localization accuracy reported in the publications.
+
 ![CI](https://github.com/Homeew/magnetic-dipole-simulator/actions/workflows/ci.yml/badge.svg)
 [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](https://homeew.github.io/magnetic-dipole-simulator/)
 # Magnetic Dipole Field Simulator
