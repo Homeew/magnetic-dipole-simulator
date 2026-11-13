@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
 
     bool csvMode      = (argc > 1 && std::string(argv[1]) == "--csv");
     bool benchMode    = (argc > 1 && std::string(argv[1]) == "--benchmark");
+    bool mcMode    = (argc > 1 && std::string(argv[1]) == "--montecarlo");
     DipoleSource truth({ 0.05, -0.03, 0.02 }, { 0.0, 0.0, 1.5 });
     auto array = SensorArray::ring(16, 0.08, 0.10);
 
@@ -36,7 +37,7 @@ int main(int argc, char* argv[]) {
     DipoleSource init({ 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
 
     LMSolver::Options opts;
-    opts.verbose = !csvMode && !benchMode;
+    opts.verbose = !csvMode && !benchMode && !mcMode;
     LMSolver solver(opts);
     LMResult result = solver.solve(array, measurements, init);
 
@@ -90,6 +91,41 @@ int main(int argc, char* argv[]) {
             std::cout << n << "," << totalErr / 20.0 << "\n";
         }
 
+        return 0;
+    }
+    // ── Monte Carlo noise sweep ───────────────────────────────────────────
+    if (mcMode) {
+        const int    TRIALS  = 300;
+        const double sigmas[] = {1e-11, 1e-10, 1e-9, 1e-8, 1e-7, 1e-6};
+        const int    NS       = 6;
+
+        DipoleSource mc_truth({0.05, -0.03, 0.02}, {0.0, 0.0, 1.5});
+        auto mc_array = SensorArray::ring(16, 0.08, 0.10);
+        DipoleSource mc_init({0.0, 0.0, 0.0}, {0.0, 0.0, 1.0});
+
+        LMSolver::Options mc_opts;
+        mc_opts.verbose = false;
+        LMSolver mc_solver(mc_opts);
+
+        std::cout << "MONTECARLO\n";
+        std::cout << "sigma,trial,converged,pos_err_mm,mom_err,iterations\n";
+
+        for (int s = 0; s < NS; ++s) {
+            double sigma = sigmas[s];
+            for (int t = 0; t < TRIALS; ++t) {
+                GaussianNoise mc_noise(sigma, static_cast<uint64_t>(t * 7919 + s * 1000));
+                auto mc_meas = mc_array.measureNoisy(mc_truth, mc_noise);
+                auto mc_res  = mc_solver.solve(mc_array, mc_meas, mc_init);
+                double pe = (mc_truth.position - mc_res.estimated.position).norm() * 1e3;
+                double me = (mc_truth.moment   - mc_res.estimated.moment).norm();
+                std::cout << std::scientific << std::setprecision(3) << sigma
+                          << "," << t
+                          << "," << (mc_res.converged ? 1 : 0)
+                          << "," << std::fixed << std::setprecision(8) << pe
+                          << "," << me
+                          << "," << mc_res.iterations << "\n";
+            }
+        }
         return 0;
     }
     // ── CSV mode ──────────────────────────────────────────────────────────
