@@ -1,2 +1,0 @@
-/usr/bin/ar qc libdipole_lib.a CMakeFiles/dipole_lib.dir/src/sensor_array.cpp.o CMakeFiles/dipole_lib.dir/src/lm_solver.cpp.o
-/usr/bin/ranlib libdipole_lib.a
