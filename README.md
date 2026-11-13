@@ -1,3 +1,5 @@
+![CI](https://github.com/Homeew/magnetic-dipole-simulator/actions/workflows/ci.yml/badge.svg)
+
 # Magnetic Dipole Field Simulator
 
 A standalone C++ simulation of magnetic dipole fields with configurable
