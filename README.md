@@ -14,13 +14,28 @@ sensor array modeling and nonlinear least-squares parameter estimation.
 
 ## Results
 
-| Array type                | Sensors | Position error | Moment error  |
-|---------------------------|---------|----------------|---------------|
-| Ring (r=0.08m, z=0.10m)   | 16      | 0.0007 mm      | 0.00003 A.m2  |
-| Grid (0.5x0.5m, z=0.30m)  | 64      | 0.46 mm        | 0.011 A.m2    |
+### Position error vs noise level (16 sensors, ring array)
 
-Noise level: 1 nT (SNR ~ 111 dB)
+| Noise σ | Mean position error |
+|---------|-------------------|
+| 1 pT | 0.46 μm |
+| 1 nT | 0.49 μm |
+| 10 nT | 1.9 μm |
+| 100 nT | 18.6 μm |
+| 1 μT | 186 μm |
 
+### Position error vs number of sensors (σ = 1 nT)
+
+| Sensors | Mean position error |
+|---------|-------------------|
+| 4 | 0.68 μm |
+| 16 | 0.49 μm |
+| 32 | 0.18 μm |
+| 48 | 0.14 μm |
+
+### Benchmark plot
+
+![Benchmark](plots/plot_benchmark.png)
 ## Visualisations
 
 ## Dashboard

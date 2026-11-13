@@ -24,8 +24,8 @@ double momError(const DipoleSource& a, const DipoleSource& b) {
 
 int main(int argc, char* argv[]) {
 
-    bool csvMode = (argc > 1 && std::string(argv[1]) == "--csv");
-
+    bool csvMode      = (argc > 1 && std::string(argv[1]) == "--csv");
+    bool benchMode    = (argc > 1 && std::string(argv[1]) == "--benchmark");
     DipoleSource truth({ 0.05, -0.03, 0.02 }, { 0.0, 0.0, 1.5 });
     auto array = SensorArray::ring(16, 0.08, 0.10);
 
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
     DipoleSource init({ 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
 
     LMSolver::Options opts;
-    opts.verbose = !csvMode;
+    opts.verbose = !csvMode && !benchMode;
     LMSolver solver(opts);
     LMResult result = solver.solve(array, measurements, init);
 
@@ -48,6 +48,50 @@ int main(int argc, char* argv[]) {
     LMSolver solver2(opts2);
     LMResult result2 = solver2.solve(gridArray, gridMeas, init);
 
+    // ── Benchmark mode ────────────────────────────────────────────────────
+    if (benchMode) {
+        DipoleSource benchTruth({ 0.05, -0.03, 0.02 }, { 0.0, 0.0, 1.5 });
+        DipoleSource benchInit({ 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0 });
+        LMSolver::Options bopts;
+        bopts.verbose = false;
+        LMSolver bsolver(bopts);
+
+        // ── sweep 1: position error vs noise level ────────────────────────
+        std::cout << "NOISE_SWEEP\n";
+        std::vector<double> sigmas = {
+            1e-12, 1e-11, 1e-10, 1e-9, 1e-8, 1e-7, 1e-6, 1e-5
+        };
+        auto barray = SensorArray::ring(16, 0.08, 0.10);
+        for (double sigma : sigmas) {
+            double totalErr = 0;
+            for (int trial = 0; trial < 20; ++trial) {
+                GaussianNoise n(sigma, trial * 100);
+                auto m = barray.measureNoisy(benchTruth, n);
+                auto r = bsolver.solve(barray, m, benchInit);
+                totalErr += (r.estimated.position - benchTruth.position).norm();
+            }
+            double meanErr = totalErr / 20.0;
+            std::cout << sigma << "," << meanErr << "\n";
+        }
+
+        // ── sweep 2: position error vs number of sensors ──────────────────
+        std::cout << "SENSOR_SWEEP\n";
+        std::vector<int> nSensors = { 4, 6, 8, 12, 16, 24, 32, 48 };
+        const double benchSigma = 1e-9;
+        for (int n : nSensors) {
+            auto arr = SensorArray::ring(n, 0.08, 0.10);
+            double totalErr = 0;
+            for (int trial = 0; trial < 20; ++trial) {
+                GaussianNoise noise(benchSigma, trial * 100);
+                auto m = arr.measureNoisy(benchTruth, noise);
+                auto r = bsolver.solve(arr, m, benchInit);
+                totalErr += (r.estimated.position - benchTruth.position).norm();
+            }
+            std::cout << n << "," << totalErr / 20.0 << "\n";
+        }
+
+        return 0;
+    }
     // ── CSV mode ──────────────────────────────────────────────────────────
     if (csvMode) {
         std::cout << "SENSORS\n";
