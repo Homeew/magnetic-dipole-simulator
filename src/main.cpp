@@ -72,6 +72,10 @@ int main(int argc, char* argv[]) {
         std::cout << "COSTS\n";
         for (double c : result.costHistory)
             std::cout << c << "\n";
+        std::cout << "HISTORY\n";
+        for (const auto& p : result.paramHistory)
+            std::cout << p[0] << "," << p[1] << "," << p[2] << ","
+                      << p[3] << "," << p[4] << "," << p[5] << "\n";
         std::cout << "ESTIMATED\n";
         std::cout << result.estimated.position.x << ","
                   << result.estimated.position.y << ","

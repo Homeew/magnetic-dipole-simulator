@@ -16,6 +16,8 @@ struct LMResult {
     bool         converged{false};// true if a tolerance was met
     std::string  message;         // human-readable reason for stopping
     std::vector<double> costHistory;  // cost at each accepted iteration
+    std::vector<std::array<double,6>> paramHistory;  // parameters at each accepted step
+
 };
 
 /**

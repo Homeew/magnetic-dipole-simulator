@@ -231,6 +231,9 @@ LMResult LMSolver::solve(const SensorArray&       array,
         if (newCost < currCost) {
             // ── Accept the step ──────────────────────────────────────────
             result.costHistory.push_back(newCost);
+            std::array<double,6> p{};
+            candidate.toParams(p.data());
+            result.paramHistory.push_back(p);
             double relDelta = std::fabs(currCost - newCost) / (currCost + 1e-30);
 
             double dxNorm = 0;

@@ -23,6 +23,14 @@ Noise level: 1 nT (SNR ~ 111 dB)
 
 ## Visualisations
 
+## Dashboard
+
+![Dashboard](plots/plot_dashboard.png)
+
+## LM Solver Convergence Animation
+
+![LM convergence](plots/lm_convergence.gif)
+
 ### Sensor Array Geometry
 ![Sensor geometry](plots/plot1_sensor_geometry.png)
 
