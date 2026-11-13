@@ -143,14 +143,14 @@ TEST_CASE("GaussianNoise", "[noise]") {
             REQUIRE(n1.sample() == Approx(n2.sample()));
     }
 
-    SECTION("corrupt shifts values by noise amount") {
-        GaussianNoise noise(0.0, 42);   // zero noise
+    SECTION("corrupt shifts values by a small noise amount") {
+        GaussianNoise noise(1e-12, 42);  // tiny but valid sigma
         Vec3 v{1.0, 2.0, 3.0};
         Vec3 c = noise.corrupt(v);
-        // with sigma=0 the output should equal the input exactly
-        REQUIRE(c.x == Approx(v.x));
-        REQUIRE(c.y == Approx(v.y));
-        REQUIRE(c.z == Approx(v.z));
+        // output should be very close to input
+        REQUIRE(c.x == Approx(v.x).epsilon(1e-6));
+        REQUIRE(c.y == Approx(v.y).epsilon(1e-6));
+        REQUIRE(c.z == Approx(v.z).epsilon(1e-6));
     }
 }
 
