@@ -101,7 +101,10 @@ private:
                                 const std::vector<Vec3>& meas,
                                 double                   h,
                                 std::vector<double>&     J);
-
+    // Analytical Jacobian: exact derivatives of the dipole formula
+    static void computeJacobianAnalytical(const DipoleSource&      src,
+                                          const SensorArray&       array,
+                                          std::vector<double>&     J);
     // Solve (J'J + λI) Δx = -J'r  via Gaussian elimination
     // Returns false if the matrix is singular
     static bool solveNormalEquations(const std::vector<double>& J,

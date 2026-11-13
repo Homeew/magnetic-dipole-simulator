@@ -50,40 +50,65 @@ double LMSolver::cost(const std::vector<double>& r) {
 // where ej is the unit vector along parameter j.
 // Central differences are more accurate than forward differences (O(h²) vs O(h)).
 //
-void LMSolver::computeJacobian(const DipoleSource&      src,
-                                const SensorArray&       array,
-                                const std::vector<Vec3>& meas,
-                                double                   h,
-                                std::vector<double>&     J)
+void LMSolver::computeJacobianAnalytical(const DipoleSource&  src,
+                                          const SensorArray&   array,
+                                          std::vector<double>& J)
 {
-    const std::size_t nRes = 3 * array.size();   // number of residuals
-    J.resize(nRes * NP);                          // J stored row-major: J[i*NP+j]
+    const std::size_t N    = array.size();
+    const std::size_t nRes = 3 * N;
+    J.resize(nRes * NP);
 
-    double params[NP], pPlus[NP], pMinus[NP];
-    src.toParams(params);                         // get current parameter values
+    const double coeff0 = constants::mu0 / (4.0 * M_PI);
 
-    std::vector<double> rPlus(nRes), rMinus(nRes);
+    for (std::size_t i = 0; i < N; ++i) {
+        Vec3 r = array.sensors[i].position - src.position;
+        double R = r.norm();
+        if (R < 1e-15) {
+            for (int j = 0; j < NP; ++j)
+                J[(3*i)*NP+j] = J[(3*i+1)*NP+j] = J[(3*i+2)*NP+j] = 0;
+            continue;
+        }
 
-    for (int j = 0; j < NP; ++j) {               // for each parameter
+        double R2    = R * R;
+        double R3    = R2 * R;
+        Vec3   rhat  = r / R;
+        double C     = coeff0 / R3;
+        double md    = src.moment.dot(rhat);  // m · r̂
 
-        // copy current params and perturb parameter j
-        std::memcpy(pPlus,  params, sizeof(double)*NP);
-        std::memcpy(pMinus, params, sizeof(double)*NP);
-        pPlus[j]  += h;    // forward perturbation
-        pMinus[j] -= h;    // backward perturbation
+        double rx = rhat.x, ry = rhat.y, rz = rhat.z;
+        double mx = src.moment.x, my = src.moment.y, mz = src.moment.z;
 
-        // evaluate residuals at both perturbed points
-        DipoleSource srcPlus  = DipoleSource::fromParams(pPlus);
-        DipoleSource srcMinus = DipoleSource::fromParams(pMinus);
-        computeResiduals(srcPlus,  array, meas, rPlus);
-        computeResiduals(srcMinus, array, meas, rMinus);
+        // ── dB/dm  (columns 3,4,5) ───────────────────────────────────────
+        // dB/dm_j = C * [3*r̂_j*r̂ - e_j]
+        double rh[3] = {rx, ry, rz};
+        for (int j = 0; j < 3; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                double val = C * (3.0*rh[j]*rh[k] - (j==k ? 1.0 : 0.0));
+                J[(3*i+k)*NP+(3+j)] = val;
+            }
+        }
 
-        // central difference: column j of J
-        for (std::size_t i = 0; i < nRes; ++i)
-            J[i * NP + j] = (rPlus[i] - rMinus[i]) / (2.0 * h);
+        // ── dB/dp  (columns 0,1,2) ───────────────────────────────────────
+        // r = sensor - p  =>  dr/dp_j = -e_j
+        //
+        // dB/dp_j = (3C·r_j/R²)·[3md·r̂ - m]
+        //         + (3C/R)·[-m_j·r̂  +  2·r̂_j·md·r̂  -  md·e_j]
+        double r_arr[3] = {r.x, r.y, r.z};
+        double m_arr[3] = {mx, my, mz};
+        double B_arr[3] = {3*md*rx - mx, 3*md*ry - my, 3*md*rz - mz};
+
+        for (int j = 0; j < 3; ++j) {
+            double t1 = 3.0 * C * r_arr[j] / R2;
+            double t2 = 3.0 * C / R;
+            for (int k = 0; k < 3; ++k) {
+                J[(3*i+k)*NP+j] = t1 * B_arr[k]
+                                 + t2 * (-m_arr[j]*rh[k]
+                                         + 2.0*rh[j]*md*rh[k]
+                                         - md*(j==k ? 1.0 : 0.0));
+            }
+        }
     }
 }
-
 // ── solveNormalEquations ─────────────────────────────────────────────────
 //
 // Solves the 6×6 linear system:  (J'J + λI) Δx = -J'r
@@ -180,9 +205,8 @@ LMResult LMSolver::solve(const SensorArray&       array,
 
     for (int iter = 0; iter < opts_.maxIter; ++iter) {
 
-        // compute Jacobian at current estimate
-        computeJacobian(result.estimated, array, meas, opts_.fdStep, J);
-
+        // compute Jacobian at current estimate (analytical — exact, no FD steps)
+        computeJacobianAnalytical(result.estimated, array, J);
         // solve the damped normal equations for step Δx
         std::array<double, NP> dx{};
         if (!solveNormalEquations(J, r, lambda, r.size(), dx)) {
@@ -239,7 +263,6 @@ LMResult LMSolver::solve(const SensorArray&       array,
             double dxNorm = 0;
             for (auto v : dx) dxNorm += v*v;
             dxNorm = std::sqrt(dxNorm);
-            result.costHistory.push_back(newCost);
             result.estimated = candidate;   // update estimate
             r        = rNew;                // update residuals
             currCost = newCost;             // update cost
