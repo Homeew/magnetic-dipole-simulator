@@ -33,7 +33,7 @@ levels — consistent with the localization accuracy reported in the publication
 
 ![CI](https://github.com/Homeew/magnetic-dipole-simulator/actions/workflows/ci.yml/badge.svg)
 [![Documentation](https://img.shields.io/badge/docs-doxygen-blue.svg)](https://homeew.github.io/magnetic-dipole-simulator/)
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.24353414)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.24353414.svg)](https://doi.org/10.5281/zenodo.24353414)
 # Magnetic Dipole Field Simulator
 
 A standalone C++ simulation of magnetic dipole fields with configurable
