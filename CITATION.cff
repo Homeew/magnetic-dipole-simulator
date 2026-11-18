@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+title: "Magnetic Dipole Field Simulator"
+message: "If you use this software, please cite it using the metadata below."
+type: software
+authors:
+  - family-names: Yaghoobian
+    given-names: Omid
+    orcid: "https://orcid.org/YOUR-ORCID-HERE"
+repository-code: "https://github.com/Homeew/magnetic-dipole-simulator"
+url: "https://homeew.github.io/magnetic-dipole-simulator/"
+abstract: >
+  A standalone C++ simulation of magnetic dipole fields with configurable
+  sensor array modeling (ring, grid, sphere) and nonlinear least-squares
+  parameter estimation via Levenberg-Marquardt optimisation. Implements
+  the core estimation pipeline underlying published research on magnetic
+  localization for wireless capsule endoscopy.
+keywords:
+  - magnetic dipole
+  - Levenberg-Marquardt
+  - localization
+  - wireless capsule endoscopy
+  - C++
+  - pybind11
+license: MIT
+version: "1.0.0"
+doi: "10.5281/zenodo.XXXXXXX"
+date-released: "2026-11-18"
+references:
+  - type: article
+    title: "Two-stage cylindrical magnetic localization with neural network calibration for wearable capsule endoscopy"
+    authors:
+      - family-names: Yaghoobian
+        given-names: Omid
+      - family-names: Einlou
+        given-names: M.
+      - family-names: Wahid
+        given-names: Khan A.
+    journal: "Scientific Reports"
+    year: 2026
+  - type: article
+    title: "A New Localization Algorithm for a Two-Layer Magnetic Sensor Array in Capsule Endoscopy"
+    authors:
+      - family-names: Yaghoobian
+        given-names: Omid
+      - family-names: Wahid
+        given-names: Khan A.
+    journal: "ICCIT 2025"
+    year: 2025
