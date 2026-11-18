@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Yaghoobian
     given-names: Omid
-    orcid: "https://orcid.org/YOUR-ORCID-HERE"
+    orcid: "https://orcid.org/0009-0005-8786-2416"
 repository-code: "https://github.com/Homeew/magnetic-dipole-simulator"
 url: "https://homeew.github.io/magnetic-dipole-simulator/"
 abstract: >
